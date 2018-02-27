@@ -109,19 +109,17 @@ $.fn.getNext = function(front , M , i){
 
 $(document).ready(function(){
   var carousel = $("#carousel");
+  var val = +1;
   N = carousel.children().length;
-  console.log("N : "+N);
-  $nbToShow =5;
+  $nbToShow =9;
   $front = 6;
-  $delay = 500;
+  $delay = 700;
   
   var clickEnabled = true;
-  function onClick(val){
-    console.log("\n");
+  function onClick(){
     if(!clickEnabled) return ;
     clickEnabled = false;
-    $front = ($front+val)%N;
-    if($front<0) $front = $front + N;
+    $front = $.fn.getNext($front,0,val);
     carousel.reloadCarousel($nbToShow,$front,val);
     setTimeout(function(){clickEnabled=true} , $delay+100);
   };
@@ -129,12 +127,24 @@ $(document).ready(function(){
   carousel.reloadCarousel($nbToShow,$front,+1);
   
   $(".left-control").on("click",function(){
-    onClick(-1);
+    val = -1;
+    onClick();
   });
   
   $(".right-control").on("click",function(){
-    onClick(+1);
+    val = +1;
+    onClick();
   });
+  
+  function autoCarousel(){
+    $front = $.fn.getNext($front,0,val);
+    carousel.reloadCarousel($nbToShow,$front,val);
+    setTimeout(function(){
+      autoCarousel();
+    },10000);
+  }
+  
+  autoCarousel();
   
 });
 

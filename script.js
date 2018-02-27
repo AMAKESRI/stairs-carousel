@@ -3,10 +3,11 @@ var N = 0 , $front = 0 , $nbToShow = 0 , $delay = 0;
 
 $.fn.extend({
   reloadCarousel : function(nbToShow,front,val){
+    if(N==0) return;
     var carousel = $(this);
     var items = carousel.children("div.item");
     if(front>=N || front<0) front = 0;
-    if(nbToShow>N || nbToShow<=0) nbToShow = Math.min(17,N);
+    if(nbToShow>N || nbToShow<=0) nbToShow = N;
     var M = Math.floor(nbToShow/2) - (1-nbToShow%2);
     
     var CW = carousel.width();
@@ -18,43 +19,44 @@ $.fn.extend({
     
     var Widths = [] , Heights = [] ;
     var Tops = [] , Margins = [];
-    var sumW = 0.0;
-  
+
+    
+    var a = (CW-W)/2;
+    var diff = 2*a/(M*M+M);
+    var Ri ;
+    
+    Widths[0] = W;
+    Heights[0] = H;
+    
     for(var i=1; i<=M; i++){
-      Widths[i] = (1-i/10)*W;
-      Heights[i] = (1-i/10)*H;
+      //Widths[i] = (1-i/(M+1))*W; another possible calcul
+      Ri = (M-i+1)*diff;
+      Widths[i] = Widths[i-1]/2 + Ri;
+      Margins[i] = Widths[i] - Ri;
+      Heights[i] = (1-i/(M+1))*H;
       Tops[i] = (CH - Heights[i])/2;
-      sumW = sumW+Widths[i];
     }
-    var a ;
-    if(sumW>0.0){
-      a= (CW - W) / (2*sumW) ;
-    }
-   
-    for(var j = 1; j<=M; j++){
-      Margins[j] = (1-a)*Widths[j];
-    }
+    
   
     var csss = [];
     
     
-    
+    var ind;
     for(var i=0; i<N; i++){
-      var ind = (front-M+i)%N;
-      if(ind<0) ind+=N;
+      ind = $.fn.getNext(front, M,i);
       
       if(i<M){
         csss[ind] = {
           "width" : Widths[M-i]+"px",
           "height" : Heights[M-i]+"px",
           "top" : Tops[M-i]+"px",
-          "margin-right": -Margins[M-i],
+          "margin-right": -Margins[M-i]+"px",
           "z-index" : i,
-          "opacity": 1 - (M-i)/10,
+          "opacity": 1 - (M-i)/(M+1),
           "display":"block",
           "-webkit-order":i+1,
           "order":i+1,
-          "text-align":"float"
+          "text-align":i==M?"center":"float"
         };
       }else if(i==M){
         csss[ind] = {
@@ -65,7 +67,7 @@ $.fn.extend({
           "opacity": "0.95",
           "display":"block",
           "-webkit-order":i+1,
-          "order": i+1,
+          "order":i+1,
           "text-align":"center"
         };
       }else if(i<2*M+1){
@@ -73,9 +75,9 @@ $.fn.extend({
           "width" : Widths[i-M]+"px",
           "height" : Heights[i-M]+"px",
           "top" : Tops[i-M]+"px",
-          "margin-left": -Margins[i-M],
+          "margin-left": -Margins[i-M]+"px",
           "z-index" : 2*M-i,
-          "opacity": 1 + (M-i)/10,
+          "opacity": 1 + (M-i)/(M+1),
           "display":"block",
           "-webkit-order":i+1,
           "order": i+1,
@@ -89,41 +91,54 @@ $.fn.extend({
         };
       }
     }
+    var j = 0; // just to avoid any future loop even it's not neccessay
+    ind =  $.fn.getNext(front, M,val==-1?2*M+1:-1);
+    var end = $.fn.getNext(front, M,val==-1?0:2*M);
+    //items.eq(ind).fadeOut($delay,"linear");
+    items.eq(ind).animate(csss[ind],$delay,"linear");
+    while(ind!=end && j<2*M+1){
+      ind = (ind+val)%N;
+      if(ind<0) ind+=N;
+      console.log(ind);
+      items.eq(ind).animate(csss[ind],$delay,"linear");
+      j++;
+    }
+    //items.eq(end).fadeIn($delay,"linear");
+    items.eq(ind).animate(csss[ind],$delay,"linear");
+    
     
     for(var i=0; i<N; i++){
-      var ind = (front-M+i)%N;
-      if(ind<0) ind += N;
-      if((i==0 || i==2*M+1) && val == -1){
-        if(i==0) items.eq(ind).fadeIn($delay,"linear");
-        if(i==2*M+1) items.eq(ind).fadeOut($delay,"linear");
-      }else if((i==2*M || i==N-1) && val == +1){
-        if(i==2*M)  items.eq(ind).fadeIn($delay,"linear");
-        if(i==N-1) items.eq(ind).fadeOut($delay,"linear");
-      }else{
-        items.eq(ind).animate(csss[ind],$delay,"linear");
-      }
-    }
-    for(var i=0; i<N; i++){
-      var ind = (front-M+i)%N;
-      if(ind<0) ind += N;
-      
+      ind =  $.fn.getNext(front, M,i);
       items.eq(ind).removeAttr("style");
       items.eq(ind).css(csss[ind]);
+    }
+    if(M==0){
+      items.eq(front).css({
+        "left":"25%"
+      });
     }
   },
 
 });
 
+$.fn.getNext = function(front , M , i){
+  var res = (front - M + i)%N;
+  if(res<0) res += N;
+  return res;
+};
+
 
 $(document).ready(function(){
   var carousel = $("#carousel");
   N = carousel.children().length;
-  $nbToShow = 1;
+  console.log("N : "+N);
+  $nbToShow =5;
   $front = 6;
   $delay = 800;
   
   var clickEnabled = true;
   function onClick(val){
+    console.log("\n");
     if(!clickEnabled) return ;
     clickEnabled = false;
     $front = ($front+val)%N;
@@ -132,7 +147,7 @@ $(document).ready(function(){
     setTimeout(function(){clickEnabled=true} , $delay);
   };
   
-  carousel.reloadCarousel($nbToShow,$front,0);
+  carousel.reloadCarousel($nbToShow,$front,+1);
   
   $(".left-control").on("click",function(){
     onClick(-1);
@@ -143,3 +158,5 @@ $(document).ready(function(){
   });
   
 });
+
+

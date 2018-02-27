@@ -17,106 +17,85 @@ $.fn.extend({
     const W = 0.5*CW;
     const H = 0.8*CH;
     
-    var Widths = [] , Heights = [] ;
-    var Tops = [] , Margins = [];
+    var Widths = [] ;
+    var Heights = [] ;
+    var Tops = [] ;
+    var Margins = [];
+    var Opacities = [];
+    var Zindices = [];
 
     
     var a = (CW-W)/2;
     var diff = 2*a/(M*M+M);
     var Ri ;
     
-    Widths[0] = W;
-    Heights[0] = H;
+    Widths[M+1] = W;
+    Heights[M+1] = H;
+    Margins[M+1] = W/2;
+    Tops[M+1]=(CH-H)/2;
+    Opacities[M+1] = "0.95";
+    Zindices[M+1] = M;
     
-    for(var i=1; i<=M; i++){
+    for(var i=M; i>=1; i--){
       //Widths[i] = (1-i/(M+1))*W; another possible calcul
-      Ri = (M-i+1)*diff;
-      Widths[i] = Widths[i-1]/2 + Ri;
-      Margins[i] = Widths[i] - Ri;
-      Heights[i] = (1-i/(M+1))*H;
+      Ri = i*diff;
+      Widths[i] = Widths[i+1]/2 + Ri;
+      Margins[i] =Widths[i+1]/2; //Widths[i] - Ri;
+      Heights[i] = (1-(M-i+1)/(M+1))*H;
       Tops[i] = (CH - Heights[i])/2;
+      Opacities[i] = 1 - (M-i+1)/(M+1);
+      Zindices[i] = i-1;
     }
     
-  
+    for(var i=M+2; i<=2*M+1; i++){
+      Widths[i] = Widths[2*M+2-i];
+      Margins[i] =Widths[i]/2; //Widths[i] - Ri;
+      Heights[i] = Heights[2*M+2-i];
+      Tops[i] = Tops[2*M+2-i];
+      Opacities[i] = Opacities[2*M+2-i];
+      Zindices[i] = Zindices[2*M+2-i];
+    }
+    
     var csss = [];
-    
-    
     var ind;
+    
     for(var i=0; i<N; i++){
       ind = $.fn.getNext(front, M,i);
-      
-      if(i<M){
+      if(i<2*M+1){
         csss[ind] = {
-          "width" : Widths[M-i]+"px",
-          "height" : Heights[M-i]+"px",
-          "top" : Tops[M-i]+"px",
-          "margin-right": -Margins[M-i]+"px",
-          "z-index" : i,
-          "opacity": 1 - (M-i)/(M+1),
           "display":"block",
+          "width" : Widths[i+1]+"px",
+          "height" : Heights[i+1]+"px",
+          "top" : Tops[i+1]+"px",
+          "margin-right": -Margins[i+1]+"px",
+          "z-index" : Zindices[i+1],
+          "opacity": Opacities[i+1],
           "-webkit-order":i+1,
           "order":i+1,
-          "text-align":i==M?"center":"float"
-        };
-      }else if(i==M){
-        csss[ind] = {
-          "width" : W+"px",
-          "height" : H+"px",
-          "top" : "10%",
-          "z-index" : M,
-          "opacity": "0.95",
-          "display":"block",
-          "-webkit-order":i+1,
-          "order":i+1,
-          "text-align":"center"
-        };
-      }else if(i<2*M+1){
-        csss[ind] = {
-          "width" : Widths[i-M]+"px",
-          "height" : Heights[i-M]+"px",
-          "top" : Tops[i-M]+"px",
-          "margin-left": -Margins[i-M]+"px",
-          "z-index" : 2*M-i,
-          "opacity": 1 + (M-i)/(M+1),
-          "display":"block",
-          "-webkit-order":i+1,
-          "order": i+1,
-          "text-align":"right"
+          "text-align":(i<M?"left":(i==M?"center":"right")),
         };
       }else{
         csss[ind] = {
           "display":"none",
+          "width" : "0px",
+          "height" : "0px",
           "-webkit-order":i+1,
           "order": i+1
         };
       }
     }
-    var j = 0; // just to avoid any future loop even it's not neccessay
-    ind =  $.fn.getNext(front, M,val==-1?2*M+1:-1);
-    var end = $.fn.getNext(front, M,val==-1?0:2*M);
-    items.eq(ind).fadeOut($delay,"linear");
-    //items.eq(ind).animate(csss[ind],$delay,"linear");
-    while(ind!=end && j<2*M+1){
-      ind = (ind+val)%N;
-      if(ind<0) ind+=N;
-      console.log(ind);
-      items.eq(ind).animate(csss[ind],$delay,"linear");
-      j++;
-    }
-    items.eq(end).fadeIn($delay,"linear");
-    //items.eq(ind).animate(csss[ind],$delay,"linear");
     
     
     for(var i=0; i<N; i++){
-      ind =  $.fn.getNext(front, M,i);
-      items.eq(ind).removeAttr("style");
-      items.eq(ind).css(csss[ind]);
-    }
-    if(M==0){
-      items.eq(front).css({
-        "left":"25%"
-      });
-    }
+        ind =  $.fn.getNext(front, M,i);
+        items.eq(ind).removeAttr("style");
+        items.eq(ind).css(csss[ind]);
+      }
+      if(M==0){
+        items.eq(front).css({
+          "left":"25%"
+        });
+      }
   },
 
 });
@@ -132,9 +111,9 @@ $(document).ready(function(){
   var carousel = $("#carousel");
   N = carousel.children().length;
   console.log("N : "+N);
-  $nbToShow =7;
+  $nbToShow =5;
   $front = 6;
-  $delay = 800;
+  $delay = 500;
   
   var clickEnabled = true;
   function onClick(val){
@@ -144,7 +123,7 @@ $(document).ready(function(){
     $front = ($front+val)%N;
     if($front<0) $front = $front + N;
     carousel.reloadCarousel($nbToShow,$front,val);
-    setTimeout(function(){clickEnabled=true} , $delay);
+    setTimeout(function(){clickEnabled=true} , $delay+100);
   };
   
   carousel.reloadCarousel($nbToShow,$front,+1);

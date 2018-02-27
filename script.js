@@ -94,8 +94,8 @@ $.fn.extend({
     var j = 0; // just to avoid any future loop even it's not neccessay
     ind =  $.fn.getNext(front, M,val==-1?2*M+1:-1);
     var end = $.fn.getNext(front, M,val==-1?0:2*M);
-    //items.eq(ind).fadeOut($delay,"linear");
-    items.eq(ind).animate(csss[ind],$delay,"linear");
+    items.eq(ind).fadeOut($delay,"linear");
+    //items.eq(ind).animate(csss[ind],$delay,"linear");
     while(ind!=end && j<2*M+1){
       ind = (ind+val)%N;
       if(ind<0) ind+=N;
@@ -103,8 +103,8 @@ $.fn.extend({
       items.eq(ind).animate(csss[ind],$delay,"linear");
       j++;
     }
-    //items.eq(end).fadeIn($delay,"linear");
-    items.eq(ind).animate(csss[ind],$delay,"linear");
+    items.eq(end).fadeIn($delay,"linear");
+    //items.eq(ind).animate(csss[ind],$delay,"linear");
     
     
     for(var i=0; i<N; i++){
@@ -132,7 +132,7 @@ $(document).ready(function(){
   var carousel = $("#carousel");
   N = carousel.children().length;
   console.log("N : "+N);
-  $nbToShow =5;
+  $nbToShow =7;
   $front = 6;
   $delay = 800;
   

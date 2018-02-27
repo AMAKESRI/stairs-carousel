@@ -1,6 +1,12 @@
 /*
 - flex necessary for order and align-items
-- relative or absolute or fixed is necessary for to place the cildren elements as you want using : absolute , top ...
+- relative or absolute or fixed is necessary for 
+  to place the cildren elements as you want using : absolute , top ...
+*/
+
+/*
+try to add iems-align: center to carousel 
+and see another arragment way for items
 */
 
 .container {
@@ -14,12 +20,12 @@
 }
 .container>div{
   position: absolute;
+
 }
 #carousel{
   width: 100%;
   height: 100%;
   display: flex;
-  text-align: center;
 }
 
 #carousel>div {
@@ -27,14 +33,16 @@
   border-top: 1px solid grey;
   border-bottom: 1px solid grey;
   background-color: lightgray;
+  -webkit-transition-delay: 1s; /* Safari */
+  transition-delay: 1s;
+  -webkit-transition-timing-function: ease-in-out;
+  transition-timing-function: ease-in-out;
 }
 
 #carousel>div>img {
   width: 100%;
   height: 100%;
 }
-
-
 
 .left-control , .right-control {
   border-bottom: 4px solid grey ;
@@ -53,82 +61,3 @@
   right: 1%;
   transform: rotate(-135deg);
 }
-/*
-- flex necessary for order and align-items
-- relative or absolute or fixed is necessary for to place the cildren elements as you want using : absolute , top ...
-*/
-
-.container {
-  position: relative;
-  width: 99%;
-  height: 300px;
-  
-  display: flex;
-  align-items: center;
-  
-}
-.container>div{
-  position: absolute;
-}
-#carousel{
-  width: 100%;
-  height: 100%;
-  display: flex;
-  text-align: center;
-}
-
-#carousel>div {
-  position: relative;
-  border-top: 1px solid grey;
-  border-bottom: 1px solid grey;
-  background-color: lightgray;
-}
-
-#carousel>div>img {
-  width: 100%;
-  height: 100%;
-}
-
-
-
-.left-control , .right-control {
-  border-bottom: 4px solid grey ;
-  border-left: 4px solid grey ;
-  width: 15px;
-  height: 15px;
-  z-index: 99;
-  cursor: pointer;
-}
-
-.left-control {
-  left: 1%;
-  transform: rotate(45deg);
-}
-.right-control {
-  right: 1%;
-  transform: rotate(-135deg);
-}
-
-
-/*
-#carousel>div:nth-child(1){
-  background-color: red;
-}
-#carousel>div:nth-child(3){
-  background-color: green;
-}
-#carousel>div:nth-child(5){
-  background-color: blue;
-}
-#carousel>div:nth-child(7){
-  background-color: yellow;
-}
-#carousel>div:nth-child(9){
-  background-color: pink;
-}
-#carousel>div:nth-child(11){
-  background-color: brown;
-}
-#carousel>div:nth-child(13){
-  background-color: orange;
-}*/

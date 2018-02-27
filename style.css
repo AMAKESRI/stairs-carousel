@@ -33,8 +33,8 @@ and see another arragment way for items
   border-top: 1px solid grey;
   border-bottom: 1px solid grey;
   background-color: lightgray;
-  -webkit-transition-delay: 1s; /* Safari */
-  transition-delay: 1s;
+  -webkit-transition: width 2s, height 2s , order 2s , z-index 2s , opacity 2s,margin-right 2s; /* Safari */
+  transition: width 2s, height 2s , order 2s , z-index 2s , opacity 2s , margin-right 2s;
   -webkit-transition-timing-function: ease-in-out;
   transition-timing-function: ease-in-out;
 }

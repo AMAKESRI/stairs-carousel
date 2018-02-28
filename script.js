@@ -86,12 +86,13 @@ $.fn.extend({
     }
     
     
-    for(var i=0; i<N; i++){
+      for(var i=0; i<N; i++){
         ind =  $.fn.getNext(front, M,i);
         items.eq(ind).removeAttr("style");
         items.eq(ind).css(csss[ind]);
       }
       if(M==0){
+        //items.eq(front).animate({"display":"block"},"linear");
         items.eq(front).css({
           "left":"25%"
         });
@@ -115,30 +116,38 @@ $(document).ready(function(){
   $front = 6;
   $delay = 700;
   
-  var clickEnabled = true;
+  var clickEnabled = true , autoActive = true;
+  
   function onClick(){
     if(!clickEnabled) return ;
     clickEnabled = false;
     $front = $.fn.getNext($front,0,val);
     carousel.reloadCarousel($nbToShow,$front,val);
-    setTimeout(function(){clickEnabled=true} , $delay+100);
+    setTimeout(function(){
+      clickEnabled = true;
+      autoActive = true;
+    },$delay+100);
   };
   
   carousel.reloadCarousel($nbToShow,$front,+1);
   
   $(".left-control").on("click",function(){
+    autoActive = false;
     val = -1;
     onClick();
   });
   
   $(".right-control").on("click",function(){
+    autoActive = false;
     val = +1;
     onClick();
   });
   
   function autoCarousel(){
-    $front = $.fn.getNext($front,0,val);
-    carousel.reloadCarousel($nbToShow,$front,val);
+    if(autoActive){
+      $front = $.fn.getNext($front,0,val);
+      carousel.reloadCarousel($nbToShow,$front,val);
+    }
     setTimeout(function(){
       autoCarousel();
     },10000);
